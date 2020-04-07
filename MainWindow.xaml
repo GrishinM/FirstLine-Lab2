@@ -1,0 +1,231 @@
+﻿<Window x:Class="Lab2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lab2"
+        mc:Ignorable="d"
+        Title="Thread list" Height="350" Width="525" WindowState="Maximized">
+    <Window.Resources>
+        <local:MyConverter x:Key="MyConverter" />
+    </Window.Resources>
+    <Grid>
+        <Grid Name="MainGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <DataGrid Margin="20,100,20,20" AutoGenerateColumns="False" RowBackground="LightGray" AlternatingRowBackground="White" ItemsSource="{Binding Path=Notes}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Width="Auto" CanUserResize="False" Header="Идентификатор УБИ" Binding="{Binding StringFormat=УБИ.{0}, Path=Id}" IsReadOnly="True" />
+                        <DataGridTemplateColumn Width="*" CanUserResize="False" Header="Наименование УБИ">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock ToolTipService.ShowDuration="1000000" Text="{Binding StringFormat=УБИ.{0}, Path=Name}">
+                                        <TextBlock.ToolTip>
+                                            <ToolTip Width="1000">
+                                                <StackPanel>
+                                                    <TextBlock TextWrapping="Wrap" Text="{Binding StringFormat=Описание: {0}, Path=Description}" Margin="10" />
+                                                    <TextBlock Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}" Margin="10" />
+                                                    <TextBlock Text="{Binding StringFormat=Объект воздействия: {0}, Path=Target}" Margin="10" />
+                                                    <TextBlock
+                                                        Text="{Binding StringFormat=Нарушение конфиденциальности: {0}, Path=ConfidentialityViolation, Converter={StaticResource MyConverter}}"
+                                                        Margin="10" />
+                                                    <TextBlock
+                                                        Text="{Binding StringFormat=Нарушение целостности: {0}, Path=IntegrityViolation, Converter={StaticResource MyConverter}}"
+                                                        Margin="10" />
+                                                    <TextBlock
+                                                        Text="{Binding StringFormat=Нарушение доступности: {0}, Path=AvailabilityViolation, Converter={StaticResource MyConverter}}"
+                                                        Margin="10" />
+                                                </StackPanel>
+                                            </ToolTip>
+                                        </TextBlock.ToolTip>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                
+                <StackPanel Grid.Row="1" Margin="70" HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Horizontal">
+                    <Button Name="PrevButton" Content="Назад" FontSize="20" Width="140" Click="PrevNoteClick" />
+                    <TextBlock Text="{Binding Path=CurrentPageNumber}" FontSize="25" VerticalAlignment="Center" Margin="20,10,20,10" Width="50" TextAlignment="Center" />
+                    <Button Name="NextButton" Content="Вперед" FontSize="20" Width="140" Click="NextNoteClick" />
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button Content="Обновить" VerticalAlignment="Top" Padding="20" FontSize="30" Click="UpdateClick" Margin="0,0,0,100" />
+                    <Button Content="Сохранить" VerticalAlignment="Bottom" Padding="20" FontSize="30" Click="SaveClick"></Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <Grid Name="ReportGrid" Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Отчет об обновлении" TextAlignment="Center" FontSize="50" />
+            <TextBlock Grid.Row="1" Text="{Binding StringFormat=Статус: {0}, Path=Status}" TextAlignment="Center" Margin="0,20,0,20" FontSize="40" />
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
+                        <TextBlock Text="Измененные записи" FontSize="30" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding StringFormat=Количество: {0}, Path=Changed.Count}" FontSize="20" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding Changed}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <StackPanel DataContext="{Binding OldNote}">
+                                            <TextBlock FontSize="18" Foreground="Red" FontWeight="Bold" Text="Было:" />
+                                            <TextBlock FontSize="15" Foreground="Red" Text="{Binding StringFormat=Идентификатор УБИ: {0}, Path=Id}" />
+                                            <TextBlock FontSize="15" Foreground="Red" Text="{Binding StringFormat=Наименование УБИ: {0}, Path=Name}" Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Red" TextWrapping="Wrap" Text="{Binding StringFormat=Описание: {0}, Path=Description}"
+                                                       Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Red"
+                                                       Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}" Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Red" Text="{Binding StringFormat=Объект воздействия: {0}, Path=Target}" Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Red"
+                                                       Text="{Binding StringFormat=Нарушение конфиденциальности: {0}, Path=ConfidentialityViolation, Converter={StaticResource MyConverter}}"
+                                                       Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Red"
+                                                       Text="{Binding StringFormat=Нарушение целостности: {0}, Path=IntegrityViolation, Converter={StaticResource MyConverter}}"
+                                                       Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Red"
+                                                       Text="{Binding StringFormat=Нарушение доступности: {0}, Path=AvailabilityViolation, Converter={StaticResource MyConverter}}"
+                                                       Margin="0,5,0,5" />
+                                        </StackPanel>
+                                        <StackPanel DataContext="{Binding NewNote}" Margin="0,10,0,0">
+                                            <TextBlock FontSize="18" Foreground="Green" FontWeight="Bold" Text="Стало:" />
+                                            <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Идентификатор УБИ: {0}, Path=Id}" />
+                                            <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Наименование УБИ: {0}, Path=Name}" Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Green" TextWrapping="Wrap" Text="{Binding StringFormat=Описание: {0}, Path=Description}"
+                                                       Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Green"
+                                                       Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}" Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Объект воздействия: {0}, Path=Target}" Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Green"
+                                                       Text="{Binding StringFormat=Нарушение конфиденциальности: {0}, Path=ConfidentialityViolation, Converter={StaticResource MyConverter}}"
+                                                       Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Green"
+                                                       Text="{Binding StringFormat=Нарушение целостности: {0}, Path=IntegrityViolation, Converter={StaticResource MyConverter}}"
+                                                       Margin="0,5,0,5" />
+                                            <TextBlock FontSize="15" Foreground="Green"
+                                                       Text="{Binding StringFormat=Нарушение доступности: {0}, Path=AvailabilityViolation, Converter={StaticResource MyConverter}}"
+                                                       Margin="0,5,0,5" />
+                                            <TextBlock Background="Gray" Height="20" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
+                        <TextBlock Text="Добавленные записи" FontSize="30" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding StringFormat=Количество: {0}, Path=Added.Count}" FontSize="20" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="3">
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding Added}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Идентификатор УБИ: {0}, Path=Id}" Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Наименование УБИ: {0}, Path=Name}" Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Green" TextWrapping="Wrap" Text="{Binding StringFormat=Описание: {0}, Path=Description}"
+                                                   Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Green"
+                                                   Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}" Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Объект воздействия: {0}, Path=Target}" Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Green"
+                                                   Text="{Binding StringFormat=Нарушение конфиденциальности: {0}, Path=ConfidentialityViolation, Converter={StaticResource MyConverter}}"
+                                                   Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Green"
+                                                   Text="{Binding StringFormat=Нарушение целостности: {0}, Path=IntegrityViolation, Converter={StaticResource MyConverter}}"
+                                                   Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Green"
+                                                   Text="{Binding StringFormat=Нарушение доступности: {0}, Path=AvailabilityViolation, Converter={StaticResource MyConverter}}"
+                                                   Margin="0,5,0,5" />
+                                        <TextBlock Background="Gray" Height="20" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+
+                <Grid Grid.Row="4">
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
+                        <TextBlock Text="Удаленные записи" FontSize="30" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding StringFormat=Количество: {0}, Path=Deleted.Count}" FontSize="20" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="5">
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding Deleted}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock FontSize="15" Foreground="Red" Text="{Binding StringFormat=Идентификатор УБИ: {0}, Path=Id}" Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Red" Text="{Binding StringFormat=Наименование УБИ: {0}, Path=Name}" Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Red" TextWrapping="Wrap" Text="{Binding StringFormat=Описание: {0}, Path=Description}"
+                                                   Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Red"
+                                                   Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}" Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Red" Text="{Binding StringFormat=Объект воздействия: {0}, Path=Target}" Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Red"
+                                                   Text="{Binding StringFormat=Нарушение конфиденциальности: {0}, Path=ConfidentialityViolation, Converter={StaticResource MyConverter}}"
+                                                   Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Red"
+                                                   Text="{Binding StringFormat=Нарушение целостности: {0}, Path=IntegrityViolation, Converter={StaticResource MyConverter}}"
+                                                   Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Red"
+                                                   Text="{Binding StringFormat=Нарушение доступности: {0}, Path=AvailabilityViolation, Converter={StaticResource MyConverter}}"
+                                                   Margin="0,5,0,5" />
+                                        <TextBlock Background="Gray" Height="20" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+
+                <Grid Grid.Row="6">
+                    <Button Content="Ок" FontSize="30" Width="100" Height="50" Margin="20" Click="CloseReportClick" />
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
