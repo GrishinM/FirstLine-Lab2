@@ -8,6 +8,56 @@
         Title="Thread list" Height="350" Width="525" WindowState="Maximized">
     <Window.Resources>
         <local:MyConverter x:Key="MyConverter" />
+
+        <Style x:Key="LeftButton" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Viewbox Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                            <Path Fill="Green">
+                                <Path.Data>
+                                    <PathGeometry>
+                                        <PathFigure IsClosed="True" StartPoint="90,40">
+                                            <LineSegment Point="30,40" />
+                                            <LineSegment Point="30,20" />
+                                            <LineSegment Point="0,50" />
+                                            <LineSegment Point="30,80" />
+                                            <LineSegment Point="30,60" />
+                                            <LineSegment Point="90,60" />
+                                        </PathFigure>
+                                    </PathGeometry>
+                                </Path.Data>
+                            </Path>
+                        </Viewbox>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="RightButton" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Viewbox Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                            <Path Fill="Green">
+                                <Path.Data>
+                                    <PathGeometry>
+                                        <PathFigure IsClosed="True" StartPoint="0,40">
+                                            <LineSegment Point="60,40" />
+                                            <LineSegment Point="60,20" />
+                                            <LineSegment Point="90,50" />
+                                            <LineSegment Point="60,80" />
+                                            <LineSegment Point="60,60" />
+                                            <LineSegment Point="0,60" />
+                                        </PathFigure>
+                                    </PathGeometry>
+                                </Path.Data>
+                            </Path>
+                        </Viewbox>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid Name="MainGrid">
@@ -25,20 +75,20 @@
                 <DataGrid Margin="20,100,20,20" AutoGenerateColumns="False" RowBackground="LightGray" AlternatingRowBackground="White" ItemsSource="{Binding Path=Notes}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Width="Auto" CanUserResize="False" Header="Идентификатор УБИ" Binding="{Binding StringFormat=УБИ.{0}, Path=Id}" IsReadOnly="True" />
-                        <DataGridTextColumn Width="*" CanUserResize="False" Header="Наименование УБИ" Binding="{Binding Path=Name}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Width="*" CanUserResize="False" Header="Наименование УБИ" Binding="{Binding Path=Name}" IsReadOnly="True" />
                     </DataGrid.Columns>
-                    
+
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow">
-                            <EventSetter Event="MouseDoubleClick" Handler="RowDoubleClick"></EventSetter>
+                            <EventSetter Event="MouseDoubleClick" Handler="RowDoubleClick" />
                         </Style>
                     </DataGrid.Resources>
                 </DataGrid>
 
                 <StackPanel Grid.Row="1" Margin="70" HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Horizontal">
-                    <Button Name="PrevButton" Content="Назад" FontSize="20" Width="140" Click="PrevNoteClick" />
+                    <Button Name="PrevButton" Content="Назад" FontSize="20" Width="140" Click="PrevPageClick" />
                     <TextBlock Text="{Binding Path=CurrentPageNumber}" FontSize="25" VerticalAlignment="Center" Margin="20,10,20,10" Width="50" TextAlignment="Center" />
-                    <Button Name="NextButton" Content="Вперед" FontSize="20" Width="140" Click="NextNoteClick" />
+                    <Button Name="NextButton" Content="Вперед" FontSize="20" Width="140" Click="NextPageClick" />
                 </StackPanel>
             </Grid>
 
@@ -54,31 +104,33 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <TextBlock Text="Отчет об обновлении" TextAlignment="Center" FontSize="50" />
             <TextBlock Grid.Row="1" Text="{Binding StringFormat=Статус: {0}, Path=Status}" TextAlignment="Center" Margin="0,20,0,20" FontSize="40" />
+
             <Grid Grid.Row="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="14*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                <Grid>
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
-                        <TextBlock Text="Измененные записи" FontSize="30" HorizontalAlignment="Center" />
-                        <TextBlock Text="{Binding StringFormat=Количество: {0}, Path=Changed.Count}" FontSize="20" HorizontalAlignment="Center" />
-                    </StackPanel>
-                </Grid>
+                <Button Click="PrevReportClick" Margin="20" Style="{StaticResource LeftButton}" />
 
-                <Grid Grid.Row="1">
-                    <ScrollViewer>
+                <Grid Name="ChangedGrid" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Измененные записи" FontSize="30" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Text="{Binding StringFormat=Количество: {0}, Path=Changed.Count}" FontSize="20" HorizontalAlignment="Center" />
+
+                    <ScrollViewer Grid.Row="2">
                         <ItemsControl ItemsSource="{Binding Changed}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -90,7 +142,8 @@
                                             <TextBlock FontSize="15" Foreground="Red" TextWrapping="Wrap" Text="{Binding StringFormat=Описание: {0}, Path=Description}"
                                                        Margin="0,5,0,5" />
                                             <TextBlock FontSize="15" Foreground="Red"
-                                                       Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}" Margin="0,5,0,5" />
+                                                       Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}"
+                                                       Margin="0,5,0,5" />
                                             <TextBlock FontSize="15" Foreground="Red" Text="{Binding StringFormat=Объект воздействия: {0}, Path=Target}" Margin="0,5,0,5" />
                                             <TextBlock FontSize="15" Foreground="Red"
                                                        Text="{Binding StringFormat=Нарушение конфиденциальности: {0}, Path=ConfidentialityViolation, Converter={StaticResource MyConverter}}"
@@ -102,6 +155,7 @@
                                                        Text="{Binding StringFormat=Нарушение доступности: {0}, Path=AvailabilityViolation, Converter={StaticResource MyConverter}}"
                                                        Margin="0,5,0,5" />
                                         </StackPanel>
+
                                         <StackPanel DataContext="{Binding NewNote}" Margin="0,10,0,0">
                                             <TextBlock FontSize="18" Foreground="Green" FontWeight="Bold" Text="Стало:" />
                                             <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Идентификатор УБИ: {0}, Path=Id}" />
@@ -109,7 +163,8 @@
                                             <TextBlock FontSize="15" Foreground="Green" TextWrapping="Wrap" Text="{Binding StringFormat=Описание: {0}, Path=Description}"
                                                        Margin="0,5,0,5" />
                                             <TextBlock FontSize="15" Foreground="Green"
-                                                       Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}" Margin="0,5,0,5" />
+                                                       Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}"
+                                                       Margin="0,5,0,5" />
                                             <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Объект воздействия: {0}, Path=Target}" Margin="0,5,0,5" />
                                             <TextBlock FontSize="15" Foreground="Green"
                                                        Text="{Binding StringFormat=Нарушение конфиденциальности: {0}, Path=ConfidentialityViolation, Converter={StaticResource MyConverter}}"
@@ -129,15 +184,17 @@
                     </ScrollViewer>
                 </Grid>
 
-                <Grid Grid.Row="2">
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
-                        <TextBlock Text="Добавленные записи" FontSize="30" HorizontalAlignment="Center" />
-                        <TextBlock Text="{Binding StringFormat=Количество: {0}, Path=Added.Count}" FontSize="20" HorizontalAlignment="Center" />
-                    </StackPanel>
-                </Grid>
+                <Grid Name="AddedGrid" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-                <Grid Grid.Row="3">
-                    <ScrollViewer>
+                    <TextBlock Text="Добавленные записи" FontSize="30" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Text="{Binding StringFormat=Количество: {0}, Path=Added.Count}" FontSize="20" HorizontalAlignment="Center" />
+
+                    <ScrollViewer Grid.Row="2">
                         <ItemsControl ItemsSource="{Binding Added}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -166,15 +223,17 @@
                     </ScrollViewer>
                 </Grid>
 
-                <Grid Grid.Row="4">
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
-                        <TextBlock Text="Удаленные записи" FontSize="30" HorizontalAlignment="Center" />
-                        <TextBlock Text="{Binding StringFormat=Количество: {0}, Path=Deleted.Count}" FontSize="20" HorizontalAlignment="Center" />
-                    </StackPanel>
-                </Grid>
+                <Grid Name="DeletedGrid" Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-                <Grid Grid.Row="5">
-                    <ScrollViewer>
+                    <TextBlock Text="Удаленные записи" FontSize="30" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Row="1" Text="{Binding StringFormat=Количество: {0}, Path=Deleted.Count}" FontSize="20" HorizontalAlignment="Center" />
+
+                    <ScrollViewer Grid.Row="2">
                         <ItemsControl ItemsSource="{Binding Deleted}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -203,9 +262,11 @@
                     </ScrollViewer>
                 </Grid>
 
-                <Grid Grid.Row="6">
-                    <Button Content="Ок" FontSize="30" Width="100" Height="50" Margin="20" Click="CloseReportClick" />
-                </Grid>
+                <Button Grid.Column="2" Click="NextReportClick" Style="{StaticResource RightButton}" Margin="20" />
+            </Grid>
+
+            <Grid Grid.Row="3">
+                <Button Content="Ок" FontSize="30" Width="100" Height="50" Margin="20" Click="CloseReportClick" />
             </Grid>
         </Grid>
     </Grid>

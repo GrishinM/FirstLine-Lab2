@@ -54,6 +54,8 @@ namespace Lab2
 
         private readonly Note mainNote;
 
+        private int currentReport;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -126,7 +128,7 @@ namespace Lab2
         {
             try
             {
-                //webClient.DownloadFile(new Uri(link), fileName + ".xlsx");
+                webClient.DownloadFile(new Uri(link), fileName + ".xlsx");
                 _notes = new Mapper(fileName + ".xlsx").Take<Note>().Select(x => x.Value).ToList();
                 if (!IsCorrectTable(ref _notes))
                     throw new WebException();
@@ -149,9 +151,13 @@ namespace Lab2
             OnPropertyChanged("Deleted");
             MainGrid.Visibility = Visibility.Hidden;
             ReportGrid.Visibility = Visibility.Visible;
+            ChangedGrid.Visibility = Visibility.Visible;
+            AddedGrid.Visibility = Visibility.Hidden;
+            DeletedGrid.Visibility = Visibility.Hidden;
+            currentReport = 1;
         }
 
-        private void PrevNoteClick(object sender, RoutedEventArgs e)
+        private void PrevPageClick(object sender, RoutedEventArgs e)
         {
             if (--CurrentPageNumber == 1)
                 PrevButton.IsEnabled = false;
@@ -160,7 +166,7 @@ namespace Lab2
             OnPropertyChanged("CurrentPageNumber");
         }
 
-        private void NextNoteClick(object sender, RoutedEventArgs e)
+        private void NextPageClick(object sender, RoutedEventArgs e)
         {
             if (++CurrentPageNumber == PagesCount)
                 NextButton.IsEnabled = false;
@@ -181,6 +187,50 @@ namespace Lab2
             using (var file = new StreamWriter(fileName + ".json"))
             {
                 file.Write(JsonConvert.SerializeObject(notes));
+            }
+        }
+
+        private void PrevReportClick(object sender, RoutedEventArgs e)
+        {
+            switch (currentReport = currentReport == 1 ? 3 : currentReport == 2 ? 1 : 2)
+            {
+                case 1:
+                    ChangedGrid.Visibility = Visibility.Visible;
+                    AddedGrid.Visibility = Visibility.Hidden;
+                    DeletedGrid.Visibility = Visibility.Hidden;
+                    break;
+                case 2:
+                    ChangedGrid.Visibility = Visibility.Hidden;
+                    AddedGrid.Visibility = Visibility.Visible;
+                    DeletedGrid.Visibility = Visibility.Hidden;
+                    break;
+                case 3:
+                    ChangedGrid.Visibility = Visibility.Hidden;
+                    AddedGrid.Visibility = Visibility.Hidden;
+                    DeletedGrid.Visibility = Visibility.Visible;
+                    break;
+            }
+        }
+
+        private void NextReportClick(object sender, RoutedEventArgs e)
+        {
+            switch (currentReport = currentReport % 3 + 1)
+            {
+                case 1:
+                    ChangedGrid.Visibility = Visibility.Visible;
+                    AddedGrid.Visibility = Visibility.Hidden;
+                    DeletedGrid.Visibility = Visibility.Hidden;
+                    break;
+                case 2:
+                    ChangedGrid.Visibility = Visibility.Hidden;
+                    AddedGrid.Visibility = Visibility.Visible;
+                    DeletedGrid.Visibility = Visibility.Hidden;
+                    break;
+                case 3:
+                    ChangedGrid.Visibility = Visibility.Hidden;
+                    AddedGrid.Visibility = Visibility.Hidden;
+                    DeletedGrid.Visibility = Visibility.Visible;
+                    break;
             }
         }
 
