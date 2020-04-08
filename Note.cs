@@ -20,8 +20,10 @@ namespace Lab2
 
         [Column(7)] public string AvailabilityViolation { get; set; }
 
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         [Column(8)] public string FirstInclusion { get; set; }
 
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         [Column(9)] public string LastChange { get; set; }
 
         public static bool operator ==(Note first, Note second)

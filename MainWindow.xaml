@@ -25,33 +25,14 @@
                 <DataGrid Margin="20,100,20,20" AutoGenerateColumns="False" RowBackground="LightGray" AlternatingRowBackground="White" ItemsSource="{Binding Path=Notes}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Width="Auto" CanUserResize="False" Header="Идентификатор УБИ" Binding="{Binding StringFormat=УБИ.{0}, Path=Id}" IsReadOnly="True" />
-                        <DataGridTemplateColumn Width="*" CanUserResize="False" Header="Наименование УБИ">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock ToolTipService.ShowDuration="1000000" Text="{Binding Path=Name}">
-                                        <TextBlock.ToolTip>
-                                            <ToolTip Width="1000">
-                                                <StackPanel>
-                                                    <TextBlock TextWrapping="Wrap" Text="{Binding StringFormat=Описание: {0}, Path=Description}" Margin="10" />
-                                                    <TextBlock Text="{Binding StringFormat=Источник угрозы (характеристика и потенциал нарушителя): {0}, Path=Source}" Margin="10" />
-                                                    <TextBlock Text="{Binding StringFormat=Объект воздействия: {0}, Path=Target}" Margin="10" />
-                                                    <TextBlock
-                                                        Text="{Binding StringFormat=Нарушение конфиденциальности: {0}, Path=ConfidentialityViolation, Converter={StaticResource MyConverter}}"
-                                                        Margin="10" />
-                                                    <TextBlock
-                                                        Text="{Binding StringFormat=Нарушение целостности: {0}, Path=IntegrityViolation, Converter={StaticResource MyConverter}}"
-                                                        Margin="10" />
-                                                    <TextBlock
-                                                        Text="{Binding StringFormat=Нарушение доступности: {0}, Path=AvailabilityViolation, Converter={StaticResource MyConverter}}"
-                                                        Margin="10" />
-                                                </StackPanel>
-                                            </ToolTip>
-                                        </TextBlock.ToolTip>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Width="*" CanUserResize="False" Header="Наименование УБИ" Binding="{Binding Path=Name}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
+                    
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow">
+                            <EventSetter Event="MouseDoubleClick" Handler="RowDoubleClick"></EventSetter>
+                        </Style>
+                    </DataGrid.Resources>
                 </DataGrid>
 
                 <StackPanel Grid.Row="1" Margin="70" HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Horizontal">
@@ -161,7 +142,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Идентификатор УБИ: \'{0}\', Path=Id}" Margin="0,5,0,5" />
+                                        <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Идентификатор УБИ: {0}, Path=Id}" Margin="0,5,0,5" />
                                         <TextBlock FontSize="15" Foreground="Green" Text="{Binding StringFormat=Наименование УБИ: {0}, Path=Name}" Margin="0,5,0,5" />
                                         <TextBlock FontSize="15" Foreground="Green" TextWrapping="Wrap" Text="{Binding StringFormat=Описание: {0}, Path=Description}"
                                                    Margin="0,5,0,5" />

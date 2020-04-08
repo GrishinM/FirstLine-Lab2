@@ -8,9 +8,10 @@ using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Newtonsoft.Json;
 using Npoi.Mapper;
-using NPOI.SS.Formula.Functions;
 
 namespace Lab2
 {
@@ -201,6 +202,17 @@ namespace Lab2
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void RowDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var note = (Note) ((DataGridRow) sender).DataContext;
+            MessageBox.Show("Идентификатор УБИ: " + note.Id + Environment.NewLine + Environment.NewLine + "Наименование УБИ: " + note.Name + Environment.NewLine +
+                            Environment.NewLine + "Описание: " + note.Description + Environment.NewLine + Environment.NewLine +
+                            "Источник угрозы (характеристика и потенциал нарушителя): " + note.Source + Environment.NewLine + Environment.NewLine + "Объект воздействия: " +
+                            note.Target + Environment.NewLine + Environment.NewLine + "Нарушение конфиденциальности: " + (note.ConfidentialityViolation == "1" ? "Да" : "Нет") +
+                            Environment.NewLine + Environment.NewLine + "Нарушение целостности: " + (note.IntegrityViolation == "1" ? "Да" : "Нет") + Environment.NewLine +
+                            Environment.NewLine + "Нарушение доступности: " + (note.AvailabilityViolation == "1" ? "Да" : "Нет"));
         }
     }
 }
