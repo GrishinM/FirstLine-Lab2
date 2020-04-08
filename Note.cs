@@ -1,5 +1,4 @@
-﻿using System;
-using Npoi.Mapper.Attributes;
+﻿using Npoi.Mapper.Attributes;
 
 namespace Lab2
 {
